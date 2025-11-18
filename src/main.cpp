@@ -1,7 +1,6 @@
 #include "../include/control.h"
 #include "../include/settings.h"
 #include "../include/spaceship.h"
-#include "../include/time.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/ContextSettings.hpp>
 #include <SFML/Window/WindowStyle.hpp>
@@ -13,8 +12,8 @@ int main() {
   settings.antialiasingLevel = 4;
   sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT),
                           "Spacewar!", sf::Style::Default, settings);
-  standart_ship ship(window);
-  control c(ship);
+  spaceship ship(window);
+  control c(ship, window);
 
   while (window.isOpen()) {
     sf::Event event;

@@ -1,0 +1,12 @@
+@startuml
+class spaceship
+class planet
+class rocket
+class control <<singletone>>
+
+control --> spaceship : control ship
+planet o-- spaceship : gravity
+rocket <.. spaceship : has owner
+enemy *-- spaceship : enemy AI
+
+@enduml

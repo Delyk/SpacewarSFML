@@ -1,7 +1,7 @@
 #include "../include/control.h"
 #include "../include/settings.h"
 #include "../include/spaceship.h"
-#include "../include/time.h"
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
@@ -9,26 +9,21 @@ extern class clock globalTimer;
 
 /*** Методы класса для управления кораблём ***/
 //Конструктор
-control::control(spaceship &ship) : ship(ship) {}
+control::control(spaceship &ship, sf::RenderWindow &w)
+    : ship(ship), window(w) {}
 
 //Функция обновления
 void control::update() {
-  sf::Vector2f new_pos = ship.getPos();
-  float time = globalTimer.getTime();
 
   if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-    new_pos.x -= SHIP_SPEED * time;
+    ship.rotateLeft();
   } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-    new_pos.x += SHIP_SPEED * time;
+    ship.rotateRight();
   }
 
   if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-    new_pos.y -= SHIP_SPEED * time;
+    ship.boost();
   } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-    new_pos.y += SHIP_SPEED * time;
-  }
-
-  if (new_pos != ship.getPos()) {
-    ship.setPos(new_pos);
+    ship.reverse();
   }
 }
