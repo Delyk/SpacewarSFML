@@ -5,8 +5,6 @@
 #include <SFML/Window/ContextSettings.hpp>
 #include <SFML/Window/WindowStyle.hpp>
 
-extern class clock globalTimer;
-
 int main() {
   sf::ContextSettings settings;
   settings.antialiasingLevel = 4;
@@ -23,7 +21,7 @@ int main() {
     }
 
     window.clear();
-    c.update();
+    c.update(event);
     ship.update();
     window.display();
   }
