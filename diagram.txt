@@ -2,13 +2,11 @@
 class spaceship
 class planet
 class rocket
-class stat
 class control <<singletone>>
 
 control o-- spaceship : control ship
 planet o-- spaceship : gravity
-rocket ..> spaceship : owner
+rocket <.. spaceship : owner
 enemy *-- spaceship : enemy AI
-stat --> spaceship : output state of ship 
 
 @enduml

@@ -9,17 +9,12 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <cmath>
 #include <cstdlib>
-#include <filesystem>
 #include <iomanip>
 #include <ios>
 #include <iostream>
 
 /*** Методы интерфейса для кораблей ***/
-spaceship::spaceship(sf::RenderWindow &w) : window(w), state(*this) {
-  init_body();
-  a_inc = maxSpeed / 1000;
-  a_dec = a_inc;
-}
+spaceship::spaceship(sf::RenderWindow &w) : window(w) { init_body(); }
 
 //Инициализация корпуса
 void spaceship::init_body() {
@@ -55,6 +50,7 @@ void spaceship::boost() {
 void spaceship::stop() { engines = false; }
 
 void spaceship::reverse() {
+  engines = true;
   if (a > -maxSpeed) {
     a -= a_dec;
   }
@@ -69,18 +65,41 @@ inline float spaceship::getY() const {
   return a * std::sin((M_PI * (direction - 90)) / 180);
 }
 
+//Найти кратчайший угол поворота
+void spaceship::turning() {
+  int path = std::min(std::abs(direction - speedVect),
+                      360 - std::abs(direction - speedVect));
+  int len = std::abs(direction - speedVect);
+  if (path < len) {
+    if (direction < 0) {
+      direction = 360;
+    } else if (direction > 360) {
+      direction = 0;
+    }
+
+    if (direction < speedVect) {
+      direction -= angle_speed;
+    } else if (direction > speedVect) {
+      direction += angle_speed;
+    }
+  } else {
+    if (direction < speedVect) {
+      direction += angle_speed;
+    } else if (direction > speedVect) {
+      direction -= angle_speed;
+    }
+  }
+}
+
 //Движение объекта
 void spaceship::update() {
   if (engines) {
-    if (std::abs(direction - speedVect) < 20) {
-
-    } else if (direction < speedVect) {
-      direction += 0.1;
-    } else if (direction > speedVect) {
-      direction -= 0.1;
+    if (direction != speedVect) {
+      turning();
     }
   } else {
     if (speedVect != direction) {
+      a_inc = std::abs(a_inc);
       speedVect = direction;
     }
   }
@@ -108,26 +127,26 @@ void spaceship::update() {
     }
   }
 
-  state.printState();
+  printState();
   window.draw(body);
 }
 
 //Вывод состояния корабля
-spaceship::stat::stat(spaceship &ship) : parent(ship) {}
 
-void spaceship::stat::printState() {
+void spaceship::printState() {
   float time = clock.getElapsedTime().asSeconds();
   if (time >= update_time) {
     system("clear");
-    sf::Vector2f pos = parent.body.getPosition();
+    sf::Vector2f pos = body.getPosition();
     std::cout << "X: " << std::fixed << std::setprecision(0) << pos.x
               << " Y: " << pos.y << std::endl;
-    std::cout << "Engines: " << std::boolalpha << parent.engines << std::endl;
-    std::cout << "Acceleration: " << parent.a << std::endl;
-    std::cout << "Direction: " << parent.direction << std::endl;
-    std::cout << "Vector: " << parent.speedVect << std::endl;
-    std::cout << "Delta Vector: "
-              << std::abs(parent.speedVect - parent.direction) << std::endl;
+    std::cout << "Engines: " << std::boolalpha << engines << std::endl;
+    std::cout << "Acceleration: " << std::setprecision(4) << a_inc << std::endl;
+    std::cout << "Speed: " << a << std::endl;
+    std::cout << std::setprecision(0) << "Rotation: " << body.getRotation()
+              << std::endl;
+    std::cout << "Direction: " << direction << std::endl;
+    std::cout << "Speed Vector: " << speedVect << std::endl;
     clock.restart();
   }
 }

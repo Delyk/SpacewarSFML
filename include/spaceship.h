@@ -13,27 +13,21 @@ class spaceship {
   constexpr static const float maxSpeed = 0.5;
 
 protected:
-  class stat {
-    spaceship &parent;
-    sf::Clock clock;
-    float update_time = 0.1;
-
-  public:
-    stat(spaceship &);
-    void printState();
-  };
-
   sf::ConvexShape body;
   sf::RenderWindow &window;
-  stat state;
+  sf::Clock clock;
+  float update_time = 0.1;
   float a = 0.f;
-  float a_inc;
-  float a_dec;
+  float a_inc = maxSpeed / 1000;
+  float a_dec = a_inc;
   float direction = 0.f;
+  float angle_speed = 0.2;
   int speedVect = 0;
   bool engines = false;
 
   void init_body();
+  void printState();
+  void turning();
   inline float getX() const;
   inline float getY() const;
 
