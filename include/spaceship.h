@@ -9,7 +9,7 @@
 #include <SFML/Window/Keyboard.hpp>
 
 class spaceship {
-  constexpr static const float rotateSpeed = 1.f;
+  constexpr static const float rotateSpeed = 0.5;
   constexpr static const float maxSpeed = 0.5;
 
 protected:
@@ -19,24 +19,23 @@ protected:
   float update_time = 0.1;
   float a = 0.f;
   float a_inc = maxSpeed / 1000;
-  float a_dec = a_inc;
   float direction = 0.f;
   float angle_speed = 0.2;
   int speedVect = 0;
+  int path = 0;
   bool engines = false;
 
   void init_body();
   void printState();
   void turning();
-  inline float getX() const;
-  inline float getY() const;
+  inline float getX(float, int);
+  inline float getY(float, int);
 
 public:
   spaceship(sf::RenderWindow &);
   void rotateLeft();
   void rotateRight();
-  void boost();
+  void boost(bool reverse = false);
   void stop();
-  void reverse();
   void update();
 };

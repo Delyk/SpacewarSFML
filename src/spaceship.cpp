@@ -7,6 +7,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Vector3.hpp>
 #include <SFML/Window/Keyboard.hpp>
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <iomanip>
@@ -39,38 +40,39 @@ void spaceship::rotateLeft() { body.rotate(-rotateSpeed); }
 void spaceship::rotateRight() { body.rotate(rotateSpeed); }
 
 //Двигатели
-void spaceship::boost() {
+void spaceship::boost(bool reverse) {
   engines = true;
   speedVect = body.getRotation();
-  if (a < maxSpeed) {
-    a += a_inc;
+  if (reverse) {
+    if (a > -maxSpeed) {
+      a -= a_inc;
+    }
+  } else {
+    if (a < maxSpeed) {
+      a += a_inc;
+    }
   }
 }
 
 void spaceship::stop() { engines = false; }
 
-void spaceship::reverse() {
-  engines = true;
-  if (a > -maxSpeed) {
-    a -= a_dec;
-  }
-}
-
 //Получить новые координаты объекта
-inline float spaceship::getX() const {
-  return a * std::cos((M_PI * (direction - 90)) / 180);
+inline float spaceship::getX(float a, int dir) {
+  return a * std::cos((M_PI * (dir - 90)) / 180);
 }
 
-inline float spaceship::getY() const {
-  return a * std::sin((M_PI * (direction - 90)) / 180);
+inline float spaceship::getY(float a, int dir) {
+  return a * std::sin((M_PI * (dir - 90)) / 180);
 }
 
 //Найти кратчайший угол поворота
 void spaceship::turning() {
-  int path = std::min(std::abs(direction - speedVect),
-                      360 - std::abs(direction - speedVect));
   int len = std::abs(direction - speedVect);
-  if (path < len) {
+  path = std::min(len, 360 - len);
+  if ((std::abs(180 - path) < 20)) {
+    a = -a;
+    direction = speedVect;
+  } else if (path < len) {
     if (direction < 0) {
       direction = 360;
     } else if (direction > 360) {
@@ -99,32 +101,33 @@ void spaceship::update() {
     }
   } else {
     if (speedVect != direction) {
-      a_inc = std::abs(a_inc);
       speedVect = direction;
     }
   }
 
   if (a) {
-    sf::Vector2f offset{getX(), getY()};
+    float x = getX(a, direction), y = getY(a, direction);
+    sf::Vector2f offset = {x, y};
     body.move(offset);
-    sf::Vector2f pos = body.getPosition();
-    sf::Vector2u size = window.getSize();
+  }
 
-    if (pos.x < 0) {
-      pos.x = size.x;
-    } else if (pos.x > size.x) {
-      pos.x = 0;
-    }
+  sf::Vector2f pos = body.getPosition();
+  sf::Vector2u size = window.getSize();
 
-    if (pos.y < 0) {
-      pos.y = size.y;
-    } else if (pos.y > size.y) {
-      pos.y = 0;
-    }
+  if (pos.x < 0) {
+    pos.x = size.x;
+  } else if (pos.x > size.x) {
+    pos.x = 0;
+  }
 
-    if (pos != body.getPosition()) {
-      body.setPosition(pos);
-    }
+  if (pos.y < 0) {
+    pos.y = size.y;
+  } else if (pos.y > size.y) {
+    pos.y = 0;
+  }
+
+  if (pos != body.getPosition()) {
+    body.setPosition(pos);
   }
 
   printState();
@@ -147,6 +150,7 @@ void spaceship::printState() {
               << std::endl;
     std::cout << "Direction: " << direction << std::endl;
     std::cout << "Speed Vector: " << speedVect << std::endl;
+    std::cout << "Path: " << path << std::endl;
     clock.restart();
   }
 }

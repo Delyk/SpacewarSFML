@@ -27,6 +27,6 @@ void control::update(sf::Event &e) {
   if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
     ship.boost();
   } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-    ship.reverse();
+    ship.boost(true);
   }
 }

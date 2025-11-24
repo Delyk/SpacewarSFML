@@ -3,10 +3,13 @@ class spaceship
 class planet
 class rocket
 class control <<singletone>>
+class background <<singletone>>
+class scoreboard <<singletone>>
 
 control o-- spaceship : control ship
 planet o-- spaceship : gravity
 rocket <.. spaceship : owner
 enemy *-- spaceship : enemy AI
+rocket o-- scoreboard
 
 @enduml
