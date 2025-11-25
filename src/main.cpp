@@ -1,3 +1,4 @@
+#include "../include/background.h"
 #include "../include/control.h"
 #include "../include/settings.h"
 #include "../include/spaceship.h"
@@ -12,6 +13,7 @@ int main() {
                           "Spacewar!", sf::Style::Default, settings);
   spaceship ship(window);
   control c(ship, window);
+  sky &s = sky::instance(window);
 
   while (window.isOpen()) {
     sf::Event event;
@@ -23,6 +25,7 @@ int main() {
     window.clear();
     c.update(event);
     ship.update();
+    s.update();
     window.display();
   }
 
