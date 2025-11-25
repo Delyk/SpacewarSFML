@@ -69,7 +69,7 @@ inline float spaceship::getY(float a, int dir) {
 void spaceship::turning() {
   int len = std::abs(direction - speedVect);
   path = std::min(len, 360 - len);
-  if ((std::abs(180 - path) < 20)) {
+  if ((std::abs(180 - path) < 40)) {
     a = -a;
     direction = speedVect;
   } else if (path < len) {

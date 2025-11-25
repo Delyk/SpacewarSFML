@@ -7,9 +7,11 @@ class control {
   spaceship &ship;
   sf::RenderWindow &window;
 
-public:
   control(spaceship &, sf::RenderWindow &);
   control(control const &) = delete;
   void operator=(control const &) = delete;
+
+public:
+  static control &instance(spaceship &, sf::RenderWindow &);
   void update(sf::Event &);
 };

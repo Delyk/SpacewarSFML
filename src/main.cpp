@@ -11,7 +11,7 @@ int main() {
   sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT),
                           "Spacewar!", sf::Style::Default, settings);
   spaceship ship(window);
-  control c(ship, window);
+  control &c = control::instance(ship, window);
 
   while (window.isOpen()) {
     sf::Event event;

@@ -10,6 +10,15 @@
 control::control(spaceship &ship, sf::RenderWindow &w)
     : ship(ship), window(w) {}
 
+///Получить класс
+control &control::instance(spaceship &ship, sf::RenderWindow &w) {
+  static control *instance = nullptr;
+  if (!instance) {
+    instance = new control(ship, w);
+  }
+  return *instance;
+}
+
 //Функция обновления
 void control::update(sf::Event &e) {
   if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
