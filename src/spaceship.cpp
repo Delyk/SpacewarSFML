@@ -130,12 +130,11 @@ void spaceship::update() {
     body.setPosition(pos);
   }
 
-  printState();
+  // printState();
   window.draw(body);
 }
 
 //Вывод состояния корабля
-
 void spaceship::printState() {
   float time = clock.getElapsedTime().asSeconds();
   if (time >= update_time) {
