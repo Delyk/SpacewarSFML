@@ -13,7 +13,7 @@ class spaceship {
   constexpr static const float maxSpeed = 0.5;
 
 protected:
-  enum spaceship_state { boosted, reversed, stoped } state, prev_state;
+  enum spaceship_state { boosted, reversed, stoped } state;
   sf::ConvexShape body;
   sf::RenderWindow &window;
   sf::Clock clock;
@@ -24,7 +24,6 @@ protected:
   float angle_speed = 0.2;
   int speedVect = 0;
   int path = 0;
-  bool changes = false;
 
   void init_body();
   void printState();
