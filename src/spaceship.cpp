@@ -41,20 +41,32 @@ void spaceship::rotateRight() { body.rotate(rotateSpeed); }
 
 //Двигатели
 void spaceship::boost(bool reverse) {
-  engines = true;
   speedVect = body.getRotation();
   if (reverse) {
+    if (prev_state == boosted) {
+      changes = true;
+    }
+    state = reversed;
     if (a > -maxSpeed) {
       a -= a_inc;
     }
   } else {
+    if (prev_state == reversed) {
+      changes = true;
+    }
+    state = boosted;
     if (a < maxSpeed) {
       a += a_inc;
     }
   }
 }
 
-void spaceship::stop() { engines = false; }
+void spaceship::stop() {
+  if (state != stoped) {
+    prev_state = state;
+  }
+  state = stoped;
+}
 
 //Получить новые координаты объекта
 inline float spaceship::getX(float a, int dir) {
@@ -69,7 +81,18 @@ inline float spaceship::getY(float a, int dir) {
 void spaceship::turning() {
   int len = std::abs(direction - speedVect);
   path = std::min(len, 360 - len);
-  if ((std::abs(180 - path) < 40)) {
+  bool revDir = std::abs(180 - path) < 40;
+  if (!revDir && changes && path) {
+
+    if (a < 0) {
+      a = std::abs(a);
+
+    } else {
+      a = -a;
+    }
+    prev_state = state;
+    changes = false;
+  } else if (revDir) {
     a = -a;
     direction = speedVect;
   } else if (path < len) {
@@ -95,21 +118,21 @@ void spaceship::turning() {
 
 //Движение объекта
 void spaceship::update() {
-  if (engines) {
-    if (direction != speedVect) {
+  if (direction != speedVect) {
+    switch (state) {
+    case boosted:
+    case reversed:
       turning();
-    }
-  } else {
-    if (speedVect != direction) {
+      break;
+    case stoped:
       speedVect = direction;
+      break;
     }
   }
 
-  if (a) {
-    float x = getX(a, direction), y = getY(a, direction);
-    sf::Vector2f offset = {x, y};
-    body.move(offset);
-  }
+  float x = getX(a, direction), y = getY(a, direction);
+  sf::Vector2f offset = {x, y};
+  body.move(offset);
 
   sf::Vector2f pos = body.getPosition();
   sf::Vector2u size = window.getSize();
@@ -143,7 +166,32 @@ void spaceship::printState() {
     sf::Vector2f pos = body.getPosition();
     std::cout << "X: " << std::fixed << std::setprecision(0) << pos.x
               << " Y: " << pos.y << std::endl;
-    std::cout << "Engines: " << std::boolalpha << engines << std::endl;
+    std::cout << "State: ";
+    switch (state) {
+    case boosted:
+      std::cout << "boost";
+      break;
+    case reversed:
+      std::cout << "reverse";
+      break;
+    case stoped:
+      std::cout << "stoped";
+      break;
+    }
+    std::cout << " Prev state: ";
+    switch (prev_state) {
+    case boosted:
+      std::cout << "boost";
+      break;
+    case reversed:
+      std::cout << "reverse";
+      break;
+    case stoped:
+      std::cout << "stoped";
+      break;
+    }
+
+    std::cout << std::endl;
     std::cout << "Acceleration: " << std::setprecision(4) << a_inc << std::endl;
     std::cout << "Speed: " << a << std::endl;
     std::cout << std::setprecision(0) << "Rotation: " << body.getRotation()
