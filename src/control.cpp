@@ -4,6 +4,8 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
+#include <iostream>
+#include <optional>
 
 /*** Методы класса для управления кораблём ***/
 //Конструктор
@@ -20,22 +22,57 @@ control &control::instance(spaceship &ship, sf::RenderWindow &w) {
 }
 
 //Функция обновления
-void control::update(sf::Event &e) {
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-    ship.rotateLeft();
-  } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-    ship.rotateRight();
-  }
+void control::update(const std::optional<sf::Event> &e) {
+  const sf::Event::KeyPressed *press = e->getIf<sf::Event::KeyPressed>();
+  const sf::Event::KeyReleased *release = e->getIf<sf::Event::KeyReleased>();
 
-  if (e.type == sf::Event::KeyReleased) {
-    if ((e.key.code == sf::Keyboard::W) || (e.key.code == sf::Keyboard::S)) {
-      ship.stop();
+  if (press && release) {
+    std::cout << "BOTH" << std::endl;
+  } else if (press) {
+    std::cout << "PRESS" << std::endl;
+  } else if (release) {
+    std::cout << "RELEASE" << std::endl;
+  } else {
+    std::cout << "NONE" << std::endl;
+  }
+  if (press) {
+    switch (press->code) {
+    case sf::Keyboard::Key::A:
+      ship.setState(spaceship::left);
+      break;
+    case sf::Keyboard::Key::D:
+      ship.setState(spaceship::right);
+      break;
+    case sf::Keyboard::Key::W:
+      break;
+    case sf::Keyboard::Key::S:
+      break;
+    default:
+      // ship.setState(spaceship::stoped);
+      break;
     }
-  }
-
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-    ship.boost();
-  } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-    ship.boost(true);
+    state = PRESS;
+  } else if (release) {
+    switch (release->code) {
+    case sf::Keyboard::Key::W:
+    case sf::Keyboard::Key::S:
+      ship.setState(spaceship::stoped);
+      break;
+    case sf::Keyboard::Key::A:
+      ship.setState(spaceship::right);
+      break;
+    case sf::Keyboard::Key::D:
+      ship.setState(spaceship::left);
+      break;
+    default:
+      break;
+    }
+    state = RELEASE;
+    // ship.setState(spaceship::stoped);
+  } else {
+    if (state == RELEASE) {
+      ship.setState(spaceship::stoped);
+    }
+    // ship.setState(spaceship::stoped);
   }
 }

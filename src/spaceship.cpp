@@ -7,7 +7,6 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Vector3.hpp>
 #include <SFML/Window/Keyboard.hpp>
-#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <iomanip>
@@ -49,13 +48,14 @@ void spaceship::init_body() {
   body.setPoint(2, sf::Vector2f(0.f, 3.f));
   body.setPoint(3, sf::Vector2f(5.f, 5.f));
 
-  body.setFillColor(sf::Color::Transparent);
+  body.setFillColor(sf::Color::Black);
   body.setOutlineColor(sf::Color::White);
   body.setOutlineThickness(1.5f);
 
-  body.setOrigin(0.f, 0.f);
+  body.setOrigin({0.f, 0.f});
   sf::Vector2u center = window.getSize();
-  body.setPosition(center.x / 2.f, center.y / 2.f);
+  body.setPosition({center.x / 2.f, center.y / 2.f});
+  this->direction = body.getRotation();
 }
 
 //Вращение корабля
@@ -69,19 +69,41 @@ void spaceship::boost(bool reverse) {}
 void spaceship::stop() { state = stoped; }
 
 //Получить новые координаты объекта
-inline float spaceship::getX(float a, int dir) {
-  return a * std::cos((M_PI * (dir - 90)) / 180);
+inline float spaceship::getX(float a, sf::Angle dir) {
+  return a * std::cos(dir.asRadians());
 }
 
-inline float spaceship::getY(float a, int dir) {
-  return a * std::sin((M_PI * (dir - 90)) / 180);
+inline float spaceship::getY(float a, sf::Angle dir) {
+  return a * std::sin(dir.asRadians());
 }
 
 //Найти кратчайший угол поворота
 void spaceship::turning() {}
 
+//Состояние корабля
+void spaceship::setState(spaceship_state st) { state = st; }
+
 //Движение объекта
-void spaceship::update() {}
+void spaceship::update() {
+  switch (state) {
+  case boosted:
+    break;
+  case stoped:
+    break;
+  case left:
+    rotateLeft();
+    break;
+  case right:
+    rotateRight();
+    break;
+  }
+
+  // sf::Vector2f offset{x, y};
+  // body.move(offset);
+
+  // printState();
+  window.draw(body);
+}
 
 //Вывод состояния корабля
 
@@ -97,21 +119,22 @@ void spaceship::printState() {
     case boosted:
       std::cout << "boost";
       break;
-    case reversed:
-      std::cout << "reverse";
-      break;
     case stoped:
       std::cout << "stoped";
       break;
+    case left:
+      std::cout << "left";
+      break;
+    case right:
+      std::cout << "right";
+      break;
     }
     std::cout << std::endl;
-    std::cout << "Acceleration: " << std::setprecision(4) << a_inc << std::endl;
-    std::cout << "Speed: " << a << std::endl;
-    std::cout << std::setprecision(0) << "Rotation: " << body.getRotation()
-              << std::endl;
-    std::cout << "Direction: " << direction << std::endl;
-    std::cout << "Speed Vector: " << speedVect << std::endl;
-    std::cout << "Path: " << path << std::endl;
+    // std::cout << "Acceleration: " << std::setprecision(4) << a_inc <<
+    // std::endl; std::cout << "Speed: " << a << std::endl;
+    std::cout << std::setprecision(0)
+              << "Rotation: " << body.getRotation().asDegrees() << std::endl;
+    std::cout << "Direction: " << direction.asDegrees() << std::endl;
     clock.restart();
   }
 }
